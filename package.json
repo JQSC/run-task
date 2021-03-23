@@ -1,0 +1,120 @@
+{
+	"name": "y",
+	"displayName": "run-task",
+	"description": "",
+	"version": "0.0.1",
+	"engines": {
+		"vscode": "^1.54.0"
+	},
+	"categories": [
+		"Other"
+	],
+	"activationEvents": [
+		"onCommand:task.refresh",
+        "onCommand:task.run",
+        "onCommand:task.restart",
+        "onCommand:task.stop",
+        "onView:task-running",
+        "onView:task-deprecated"
+	],
+	"main": "./extension.js",
+	"contributes": {
+		"commands": [
+			{
+				"command": "task.refresh",
+				"title": "Refresh",
+                "icon": {
+                    "light": "resources/light/refresh.svg",
+                    "dark": "resources/dark/refresh.svg"
+                }
+			},
+            {
+				"command": "task.run",
+				"title": "Run",
+                "icon": {
+                    "light": "resources/run.svg",
+                    "dark": "resources/run.svg"
+                }
+			},
+            {
+				"command": "task.restart",
+				"title": "Restart",
+                "icon": {
+                    "light": "resources/restart.svg",
+                    "dark": "resources/restart.svg"
+                }
+			},
+            {
+				"command": "task.stop",
+				"title": "Stop",
+                "icon": {
+                    "light": "resources/stop.svg",
+                    "dark": "resources/stop.svg"
+                }
+			}
+		],
+        "menus": {
+            "view/title": [
+                {
+                    "command": "task.refresh",
+                    "when": "view == task-running",
+                    "group": "navigation"
+                }
+            ],
+            "view/item/context": [
+                {
+                    "command": "task.run",
+                    "when": "view =~ /task-running/ && viewItem == unstart",
+                    "group": "inline"
+                },
+                {
+                    "command": "task.restart",
+                    "when": "view =~ /task-running/ && viewItem == restart",
+                    "group": "inline"
+                },
+                {
+                    "command": "task.stop",
+                    "when": "view =~ /task-running/ && viewItem == running",
+                    "group": "inline"
+                }
+            ]
+        },
+        "views": {
+            "task-explorer": [
+                {
+                    "id": "task-running",
+                    "name": "WORKING"
+                },
+                {
+                    "id": "task-deprecated",
+                    "name": "DEPRECATED" 
+                }
+            ]
+        },
+        "viewsContainers": {
+            "activitybar": [
+                {
+                    "id": "task-explorer",
+                    "title": "Run Task",
+                    "icon": "resources/english.svg"
+                }
+            ]
+        }
+	},
+	"scripts": {
+		"lint": "eslint .",
+		"pretest": "npm run lint",
+		"test": "node ./test/runTest.js"
+	},
+	"devDependencies": {
+		"@types/vscode": "^1.54.0",
+		"@types/glob": "^7.1.3",
+		"@types/mocha": "^8.0.4",
+		"@types/node": "^12.11.7",
+		"eslint": "^7.19.0",
+		"glob": "^7.1.6",
+		"mocha": "^8.2.1",
+		"typescript": "^4.1.3",
+		"vscode-test": "^1.5.0"
+	}
+}
