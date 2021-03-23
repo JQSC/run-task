@@ -53,7 +53,7 @@ class ViewsItemContent extends vscode.TreeItem {
         this.contextValue = active ? 'running' : 'unstart';
         this.iconPath = active ? running : '';
         this.description = description;
-        //this.tooltip = tooltip
+        this.tooltip = tooltip
     };
 
 }

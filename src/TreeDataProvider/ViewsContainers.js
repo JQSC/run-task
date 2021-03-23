@@ -1,25 +1,15 @@
 const vscode = require('vscode');
+const path = require('path');
+const fs = require('fs');
 const View = require('./Views');
-
 class ViewsContainers {
 
     constructor(context) {
+        this.workspaceName = vscode.workspace.name;
+        this.workspaceRoot = vscode.workspace.rootPath;
 
         this.treeData = [
-            {
-                name: 'static-page', description: 'E:\run-task\resources', children: [
-                    {
-                        id: '1.1',
-                        name: 'npm run dev',
-                        description: 'package.json'
-                    },
-                    {
-                        id: '1.2',
-                        name: 'npm run test',
-                        description: 'package.json'
-                    }
-                ]
-            }
+            this.getWorkspaceScript()
         ];
 
         this.working = new View(this.treeData);
@@ -27,13 +17,60 @@ class ViewsContainers {
 
     }
 
+    getWorkspaceScript() {
+        const workspaceScript = {
+            name: this.workspaceName,
+            description: this.workspaceRoot,
+            children: []
+        };
+
+        const packageScripts = this.getPackageScripts();
+
+        workspaceScript.children = packageJsonPath;
+
+        return workspaceScript;
+    }
+
+
+    getPackageScripts() {
+        const packageJsonPath = path.join(this.workspaceRoot, 'package.json');
+
+        if (this.pathExists(packageJsonPath)) {
+            const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+            const scripts = packageJson.scripts ?
+                Object.keys(packageJson.scripts).map((key, index) => {
+                    return {
+                        id: this.workspaceName + index,
+                        name: 'npm run ' + key,
+                        description: 'package.json',
+                        tooltip: packageJson.scripts[key]
+                    }
+                })
+                : [];
+            return scripts
+        }
+        return []
+    }
+
+    getBat(){}
+
+    pathExists(p) {
+        try {
+            fs.accessSync(p);
+        } catch (err) {
+            return false;
+        }
+        return true;
+    }
+
+
     run(item) {
         let tree = this._find(item);
         tree.active = true;
         this.working.refresh();
     }
 
-    restart(item){
+    restart(item) {
 
     }
 
