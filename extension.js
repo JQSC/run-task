@@ -1,4 +1,5 @@
 const vscode = require('vscode');
+const loaders = require('./src/loaders')
 const TreeDataProvider = require('./src/TreeDataProvider/ViewsContainers');
 
 function activate(context) {
@@ -19,7 +20,7 @@ function activate(context) {
     registerCommand('task.run', (treeItem) => {
         return ViewsContainers.run(treeItem);
     })
-    
+
 
     registerCommand('task.restart', (treeItem) => {
         return ViewsContainers.restart(treeItem);
@@ -29,6 +30,7 @@ function activate(context) {
         return ViewsContainers.stop(treeItem);
     })
 
+    new loaders.NpmLoader().loadTask();
 }
 
 // 卸载执行

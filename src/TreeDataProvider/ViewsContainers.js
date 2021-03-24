@@ -26,7 +26,7 @@ class ViewsContainers {
 
         const packageScripts = this.getPackageScripts();
 
-        workspaceScript.children = packageJsonPath;
+        workspaceScript.children = packageScripts;
 
         return workspaceScript;
     }
