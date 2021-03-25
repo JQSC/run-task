@@ -30,8 +30,27 @@ function activate(context) {
         return ViewsContainers.stop(treeItem);
     })
 
-    new loaders.NpmLoader().loadTask();
+    setupLoaders(vscode.workspace.getConfiguration('runtask'))
+
 }
+
+
+function setupLoaders(globalConfig) {
+
+    const engines = [
+        loaders.NpmLoader
+    ];
+
+    const loaderList = [];
+
+    for (const engine of engines) {
+        loaderList.push(new engine(globalConfig));
+    }
+
+    const test = loaderList[0].loadTask();
+    console.log('test: ', test);
+}
+
 
 // 卸载执行
 function deactivate() { }
