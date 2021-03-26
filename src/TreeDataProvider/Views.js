@@ -1,6 +1,6 @@
 const vscode = require('vscode');
 const path = require('path');
-const running = path.join(__dirname, '..', '..', 'resources', 'running.svg');
+const runningIcon = path.join(__dirname, '..', '..', 'resources', 'running.svg');
 
 class Views {
 
@@ -36,7 +36,7 @@ class Views {
 
 class ViewsItemTitle extends vscode.TreeItem {
     constructor(item) {
-        const { name, description, tooltip, children } = item;
+        const { name, description, children } = item;
         super(name);
         // this.description = description;
         this.contextValue = 'title';
@@ -48,12 +48,12 @@ class ViewsItemTitle extends vscode.TreeItem {
 
 class ViewsItemContent extends vscode.TreeItem {
     constructor(item) {
-        const { name, description, tooltip, active } = item;
-        super(name);
+        const { cmdLine, filePath, fileName, active } = item;
+        super(cmdLine);
         this.contextValue = active ? 'running' : 'unstart';
-        this.iconPath = active ? running : '';
-        this.description = description;
-        this.tooltip = tooltip
+        this.iconPath = active ? runningIcon : '';
+        this.description = fileName;
+        this.tooltip = filePath
     };
 
 }

@@ -1,5 +1,4 @@
 const vscode = require('vscode');
-const loaders = require('./src/loaders')
 const TreeDataProvider = require('./src/TreeDataProvider/ViewsContainers');
 
 function activate(context) {
@@ -13,8 +12,8 @@ function activate(context) {
     registerTreeDataProvider('task-running', ViewsContainers.working);
     registerTreeDataProvider('task-deprecated', ViewsContainers.deprecated);
 
-    registerCommand('task.refresh', (treeItem) => {
-
+    registerCommand('task.refresh', () => {
+        return ViewsContainers.clear();
     })
 
     registerCommand('task.run', (treeItem) => {
@@ -30,25 +29,6 @@ function activate(context) {
         return ViewsContainers.stop(treeItem);
     })
 
-    setupLoaders(vscode.workspace.getConfiguration('runtask'))
-
-}
-
-
-function setupLoaders(globalConfig) {
-
-    const engines = [
-        loaders.NpmLoader
-    ];
-
-    const loaderList = [];
-
-    for (const engine of engines) {
-        loaderList.push(new engine(globalConfig));
-    }
-
-    const test = loaderList[0].loadTask();
-    console.log('test: ', test);
 }
 
 

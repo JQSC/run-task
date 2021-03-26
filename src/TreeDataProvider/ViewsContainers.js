@@ -2,72 +2,43 @@ const vscode = require('vscode');
 const path = require('path');
 const fs = require('fs');
 const View = require('./Views');
+const globalStorage = require('../globalStorage')
+const loaders = require('../loaders')
+
+const defaultTasks = {
+    working: [],
+    deprecated: []
+}
+
 class ViewsContainers {
 
     constructor(context) {
-        this.workspaceName = vscode.workspace.name;
-        this.workspaceRoot = vscode.workspace.rootPath;
 
-        this.treeData = [
-            this.getWorkspaceScript()
-        ];
+        const memorizeTasks = globalStorage.get(context);
 
-        this.working = new View(this.treeData);
-        this.deprecated = new View();
+        this.context = context;
+
+        this.treeData = memorizeTasks || defaultTasks;
+
+        this.working = new View(this.treeData.working);
+        this.deprecated = new View(this.treeData.deprecated);
+
+        this.loaderList = this.setupLoaders(vscode.workspace.getConfiguration('runtask'));
 
     }
-
-    getWorkspaceScript() {
-        const workspaceScript = {
-            name: this.workspaceName,
-            description: this.workspaceRoot,
-            children: []
-        };
-
-        const packageScripts = this.getPackageScripts();
-
-        workspaceScript.children = packageScripts;
-
-        return workspaceScript;
-    }
-
-
-    getPackageScripts() {
-        const packageJsonPath = path.join(this.workspaceRoot, 'package.json');
-
-        if (this.pathExists(packageJsonPath)) {
-            const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
-            const scripts = packageJson.scripts ?
-                Object.keys(packageJson.scripts).map((key, index) => {
-                    return {
-                        id: this.workspaceName + index,
-                        name: 'npm run ' + key,
-                        description: 'package.json',
-                        tooltip: packageJson.scripts[key]
-                    }
-                })
-                : [];
-            return scripts
-        }
-        return []
-    }
-
-    getBat(){}
-
-    pathExists(p) {
-        try {
-            fs.accessSync(p);
-        } catch (err) {
-            return false;
-        }
-        return true;
-    }
-
 
     run(item) {
-        let tree = this._find(item);
+        let tree = this._findUpdateItem(item);
         tree.active = true;
-        this.working.refresh();
+
+        let loader = this.findLoader(this.loaderList, item);
+        loader && loader.runTask(item, () => {
+            tree.active = false;
+            this.refresh();
+        });
+
+        this.refresh();
+
     }
 
     restart(item) {
@@ -76,13 +47,67 @@ class ViewsContainers {
 
 
     stop(item) {
-        let tree = this._find(item);
+        let tree = this._findUpdateItem(item);
         tree.active = false;
+        this.refresh();
+    }
+
+    get() {
+        return this.treeData.working
+    }
+
+    refresh() {
         this.working.refresh();
     }
 
-    _find(item) {
-        for (let trees of this.treeData) {
+    clear() {
+        globalStorage.update(this.context, defaultTasks);
+        this.refresh();
+    }
+
+    setupLoaders(globalConfig) {
+
+        const currentState = this.get();
+
+        if (!currentState) return;
+
+        const engines = [
+            loaders.NpmLoader
+        ];
+
+        const loaderList = [];
+
+        for (const engine of engines) {
+            loaderList.push(new engine(globalConfig));
+        }
+
+        loaderList[0].loadTask().then((tasks) => {
+
+            const index = currentState.findIndex((item) => item.name === vscode.workspace.name);
+
+            const tree = {
+                name: vscode.workspace.name,
+                description: vscode.workspace.rootPath,
+                children: tasks
+            }
+
+            if (index > -1) {
+                currentState[index] = tree
+            } else {
+                currentState.unshift(tree)
+            }
+
+            globalStorage.update(this.context, this.treeData)
+
+
+            this.refresh();
+        })
+
+        return loaderList
+    }
+
+    _findUpdateItem(item) {
+        for (let trees of this.get()) {
             for (let tree of trees.children) {
                 if (tree.id === item.id) {
                     return tree
@@ -90,6 +115,17 @@ class ViewsContainers {
             }
         }
     }
+
+    findLoader(loaderList, item) {
+        let currentLoader
+        for (let loader of loaderList) {
+            if (loader.key === item.key) {
+                currentLoader = loader
+            }
+        }
+        return currentLoader
+    }
+
 }
 
 
