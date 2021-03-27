@@ -30,14 +30,13 @@ class ViewsContainers {
     run(item) {
         let tree = this._findUpdateItem(item);
         tree.active = true;
-
+        this.refresh();
+        
         let loader = this.findLoader(this.loaderList, item);
         loader && loader.runTask(item, () => {
             tree.active = false;
             this.refresh();
         });
-
-        this.refresh();
 
     }
 
@@ -81,27 +80,27 @@ class ViewsContainers {
             loaderList.push(new engine(globalConfig));
         }
 
-        loaderList[0].loadTask().then((tasks) => {
+        for (const task of loaderList) {
+            task.loadTask((tasks) => {
+                const index = currentState.findIndex((item) => item.name === vscode.workspace.name);
 
-            const index = currentState.findIndex((item) => item.name === vscode.workspace.name);
+                const tree = {
+                    name: vscode.workspace.name,
+                    description: vscode.workspace.rootPath,
+                    children: tasks
+                }
 
-            const tree = {
-                name: vscode.workspace.name,
-                description: vscode.workspace.rootPath,
-                children: tasks
-            }
+                if (index > -1) {
+                    currentState[index] = tree
+                } else {
+                    currentState.unshift(tree)
+                }
 
-            if (index > -1) {
-                currentState[index] = tree
-            } else {
-                currentState.unshift(tree)
-            }
+                globalStorage.update(this.context, this.treeData)
 
-            globalStorage.update(this.context, this.treeData)
-
-
-            this.refresh();
-        })
+                this.refresh();
+            })
+        }
 
         return loaderList
     }
@@ -109,7 +108,7 @@ class ViewsContainers {
     _findUpdateItem(item) {
         for (let trees of this.get()) {
             for (let tree of trees.children) {
-                if (tree.id === item.id) {
+                if (tree.uid === item.uid) {
                     return tree
                 }
             }

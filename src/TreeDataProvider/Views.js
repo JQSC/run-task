@@ -48,8 +48,8 @@ class ViewsItemTitle extends vscode.TreeItem {
 
 class ViewsItemContent extends vscode.TreeItem {
     constructor(item) {
-        const { cmdLine, filePath, fileName, active } = item;
-        super(cmdLine);
+        const { cmdLineDesc, filePath, fileName, active } = item;
+        super(cmdLineDesc);
         this.contextValue = active ? 'running' : 'unstart';
         this.iconPath = active ? runningIcon : '';
         this.description = fileName;
