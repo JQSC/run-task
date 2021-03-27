@@ -31,7 +31,7 @@ class ViewsContainers {
         let tree = this._findUpdateItem(item);
         tree.active = true;
         this.refresh();
-        
+
         let loader = this.findLoader(this.loaderList, item);
         loader && loader.runTask(item, () => {
             tree.active = false;
@@ -71,7 +71,8 @@ class ViewsContainers {
         if (!currentState) return;
 
         const engines = [
-            loaders.NpmLoader
+            loaders.NpmLoader,
+            loaders.GulpLoader
         ];
 
         const loaderList = [];
@@ -80,22 +81,23 @@ class ViewsContainers {
             loaderList.push(new engine(globalConfig));
         }
 
+        const tree = {
+            name: vscode.workspace.name,
+            description: vscode.workspace.rootPath,
+            children: []
+        }
+
+        const index = currentState.findIndex((item) => item.name === vscode.workspace.name);
+
+        if (index > -1) {
+            currentState[index] = tree
+        } else {
+            currentState.unshift(tree)
+        }
+
         for (const task of loaderList) {
             task.loadTask((tasks) => {
-                const index = currentState.findIndex((item) => item.name === vscode.workspace.name);
-
-                const tree = {
-                    name: vscode.workspace.name,
-                    description: vscode.workspace.rootPath,
-                    children: tasks
-                }
-
-                if (index > -1) {
-                    currentState[index] = tree
-                } else {
-                    currentState.unshift(tree)
-                }
-
+                tree.children = tree.children.concat(tasks);
                 globalStorage.update(this.context, this.treeData)
 
                 this.refresh();

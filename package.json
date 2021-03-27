@@ -116,7 +116,7 @@
                 },
                 "runtask.searchTaskFileInSubdirectories": {
                     "type": "boolean",
-                    "default": false,
+                    "default": true,
                     "description": "Search task from subdirectories for npm and gulp etc. (experimental)"
                 },
                 "runtask.excludesGlob": {

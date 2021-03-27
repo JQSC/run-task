@@ -37,7 +37,6 @@ class NpmLoader extends TaskLoader {
         const file = JSON.parse(fs.readFileSync(fsPath, 'utf-8'));
 
         if (typeof file.scripts === "object") {
-
             for (let key of Object.keys(file.scripts)) {
                 const cmdLine = ['npm', 'run', key];
                 const cmdDesc = file.scripts[key];
@@ -49,11 +48,43 @@ class NpmLoader extends TaskLoader {
 
 }
 
+//gulp.task('scripts', function() {})
+class GulpLoader extends TaskLoader {
 
+    constructor(globalConfig) {
+
+        super(GULP_KEY, {
+            glob: globalConfig.gulpGlob,
+            enable: globalConfig.enableGulp,
+            excludesGlob: globalConfig.excludesGlob
+        }, globalConfig)
+
+    }
+
+    handleFunc(fsPath) {
+        const regexpMatcher = /gulp\.task\([\'\"][^\'\"]*[\'\"]/gi;
+        const regexpReplacer = /gulp\.task\([\'\"]([^\'\"]*)[\'\"]/;
+
+        try {
+            const fileText = fs.readFileSync(fsPath, 'utf-8');
+
+            for (let item of fileText.match(regexpMatcher)) {
+                const cmdLine = ['gulp', item.replace(regexpReplacer, "$1")];
+                const task = generateItem(GULP_KEY, fsPath, cmdLine, cmdLine);
+                this.taskList.push(task);
+            }
+        }
+        catch (e) {
+            console.error("Invalid gulp file :" + e.message);
+        }
+    }
+
+}
 
 
 
 module.exports = {
-    NpmLoader
+    NpmLoader,
+    GulpLoader
 }
 
