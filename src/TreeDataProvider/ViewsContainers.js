@@ -47,9 +47,11 @@ class ViewsContainers {
 
 
     stop(item) {
-        let tree = this._findUpdateItem(item);
-        tree.active = false;
-        this.refresh();
+        // let tree = this._findUpdateItem(item);
+        // tree.active = false;
+        // this.refresh();
+        let loader = this.findLoader(this.loaderList, item);
+        loader && loader.stopTask(item);
     }
 
     get() {

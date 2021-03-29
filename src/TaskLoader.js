@@ -15,6 +15,8 @@ class TaskLoader {
 
         this.taskList = [];
 
+        this.procession = new Set();
+
         //是否查找子目录
         if (globalConfig.searchTaskFileInSubdirectories === true) {
             if (this.glob.indexOf("**/") !== 0) {
@@ -45,6 +47,9 @@ class TaskLoader {
 
         const subProcess = spawn(command, cmdLine.slice(1), options);
 
+        item.process = subProcess;
+        this.procession.add(item);
+
         //出现错误结束子进程
         subProcess.stderr.on('data', (data) => {
             console.log('data: ');
@@ -72,6 +77,17 @@ class TaskLoader {
             console.log('error: ');
         });
 
+
+    }
+
+
+    stopTask(tree) {
+        for (let item of this.procession) {
+            if (item.key === tree.key) {
+                item.process.kill('SIGINT');
+                //this.killSubProcess(item.process);
+            }
+        }
 
     }
 
