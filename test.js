@@ -11,15 +11,16 @@ const filePath = path.join(__dirname, 'run.bat');
 // })
 
 
-let subProcess=spawn('gulp.cmd', ['website-package'], {
-    cwd: 'D:\\CGTN\\StaticPage\\templates\\freemarker',
-    detached: true
+let subProcess = spawn('run.bat', [], {
+    cwd: 'G:\\CGTN\\static-page',
+    detached: true,
+    shell: true
 })
 
 
 subProcess.stderr.on('data', (data) => {
     console.log('stderr');
-    
+
 });
 //执行完毕
 subProcess.on('close', () => {

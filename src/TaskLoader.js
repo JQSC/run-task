@@ -36,7 +36,8 @@ class TaskLoader {
 
         const options = {
             cwd: path.dirname(filePath),
-            detached: true
+            detached: true,
+            shell: true
         }
 
         //执行文件或执行系统命令 ['npm', 'run', 'dev']
