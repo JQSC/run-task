@@ -30,6 +30,7 @@ class ViewsContainers {
     run(item) {
         let tree = this._findUpdateItem(item);
         tree.active = true;
+        tree.clicks = parseInt(tree.clicks || 0) + 1;
         this.refresh();
 
         let loader = this.findLoader(this.loaderList, item);
@@ -72,7 +73,8 @@ class ViewsContainers {
 
         const engines = [
             loaders.NpmLoader,
-            loaders.GulpLoader
+            loaders.GulpLoader,
+            loaders.ScriptLoader
         ];
 
         const loaderList = [];

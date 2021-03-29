@@ -1,10 +1,8 @@
 const vscode = require('vscode');
 const path = require('path');
 const fs = require('fs');
-const { spawn } = require("child_process")
-
-const NPM_KEY = 'NPM';
-const GULP_KEY = 'gulp';
+const { spawn, exec, execFile } = require("child_process")
+const { NPM_KEY, GULP_KEY, SCRIPT_KEY } = require('./shared/loaderConfig')
 
 class TaskLoader {
 
@@ -41,26 +39,42 @@ class TaskLoader {
             detached: true
         }
 
-        //运行bat文件或执行命令 ['npm', 'run', 'dev']
-        const subProcess = spawn(this.platformShell(cmdLine[0]), cmdLine.slice(1), options);
+        //执行文件或执行系统命令 ['npm', 'run', 'dev']
+        const command = (item.key === SCRIPT_KEY) ? cmdLine[0] : this.platformShell(cmdLine[0]);
+
+        const subProcess = spawn(command, cmdLine.slice(1), options);
 
         //出现错误结束子进程
         subProcess.stderr.on('data', (data) => {
+            console.log('data: ');
+
             this.killSubProcess(subProcess);
             typeof callback === 'function' && callback();
         });
         //保护
         subProcess.on('close', () => {
+            console.log('close: ');
             this.killSubProcess(subProcess);
             typeof callback === 'function' && callback();
+        });
+
+
+        subProcess.on('error', () => {
+            console.log('error: ');
+        });
+
+        subProcess.on('exit', () => {
+            console.log('exit: ');
+        });
+
+        subProcess.on('error', () => {
+            console.log('error: ');
         });
 
 
     }
 
     parseTasksFromFile(fileList, callback) {
-
-        let packageScripts = [];
 
         if (!Array.isArray(fileList) || fileList.length === 0) {
             return [];
@@ -76,7 +90,7 @@ class TaskLoader {
         callback(this.taskList)
     }
 
-    handleFunc() { }
+    handleFunc(filePath) { console.log(filePath) }
 
     pathExists(p) {
         try {

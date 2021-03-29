@@ -29,7 +29,18 @@ class Views {
     }
 
     refresh() {
+        this.sortForClicks();
+
         this.changeTreeDataEmitter.fire(undefined);
+    }
+
+    sortForClicks() {
+        for (let workspace of this.treeData) {
+            workspace.children.sort((a, b) => {
+                let res = parseInt(b.clicks || 0) - parseInt(a.clicks || 0);
+                return res
+            })
+        }
     }
 }
 
@@ -40,20 +51,23 @@ class ViewsItemTitle extends vscode.TreeItem {
         super(name);
         // this.description = description;
         this.contextValue = 'title';
+        this.description = '';
         this.tooltip = description
-        this.collapsibleState = vscode.TreeItemCollapsibleState.Expanded;
+        this.collapsibleState = (name === vscode.workspace.name ? 2 : 1);
+        //name === vscode.workspace.name ? 1 : 0
     };
 
 }
 
 class ViewsItemContent extends vscode.TreeItem {
     constructor(item) {
-        const { cmdLineDesc, filePath, fileName, active } = item;
+        const { cmdLineDesc, filePath, fileName, active, iconPath } = item;
         super(cmdLineDesc);
         this.contextValue = active ? 'running' : 'unstart';
-        this.iconPath = active ? runningIcon : '';
-        this.description = fileName;
+        this.iconPath = iconPath;//active ? runningIcon : '';
+        this.description = active ?'RUNNING':fileName;
         this.tooltip = filePath
+
     };
 
 }
