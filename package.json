@@ -1,7 +1,8 @@
 {
     "name": "y",
+    "publisher":"csq",
     "displayName": "run-task",
-    "description": "",
+    "description": "Task manager and runner for Gulp, NPM builtin tasks and shell scripts.",
     "version": "0.0.1",
     "engines": {
         "vscode": "^1.54.0"
@@ -10,12 +11,9 @@
         "Other"
     ],
     "activationEvents": [
-        "onCommand:task.refresh",
-        "onCommand:task.run",
-        "onCommand:task.stop",
-        "onView:task-running",
-        "onView:task-deprecated"
+        "*"
     ],
+    "icon": "resources/run-from.png",
     "main": "./extension.js",
     "contributes": {
         "commands": [
@@ -156,6 +154,10 @@
                 }
             }
         }
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/JQSC/run-task.git"
     },
     "scripts": {
         "lint": "eslint .",
