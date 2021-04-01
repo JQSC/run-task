@@ -12,23 +12,22 @@ function activate(context) {
     registerTreeDataProvider('task-running', ViewsContainers.working);
     registerTreeDataProvider('task-deprecated', ViewsContainers.deprecated);
 
-    registerCommand('task.refresh', () => {
-        return ViewsContainers.clear();
-    })
-
     registerCommand('task.run', (treeItem) => {
         return ViewsContainers.run(treeItem);
     })
 
-
-    registerCommand('task.restart', (treeItem) => {
-        return ViewsContainers.restart(treeItem);
+    registerCommand('task.stop', () => {
+        //无法得知终端的详细状态
+        //return ViewsContainers.stop(treeItem);
     })
 
-    registerCommand('task.stop', (treeItem) => {
-        return ViewsContainers.stop(treeItem);
+    registerCommand('workspace.remove', (workspace) => {
+        return ViewsContainers.removeWorkSpace(workspace);
     })
 
+    registerCommand('workspace.refresh', (workspace) => {
+        return ViewsContainers.workspaceRefresh(workspace);
+    })
 }
 
 

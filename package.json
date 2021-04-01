@@ -12,7 +12,6 @@
     "activationEvents": [
         "onCommand:task.refresh",
         "onCommand:task.run",
-        "onCommand:task.restart",
         "onCommand:task.stop",
         "onView:task-running",
         "onView:task-deprecated"
@@ -21,19 +20,11 @@
     "contributes": {
         "commands": [
             {
-                "command": "task.refresh",
-                "title": "Refresh",
-                "icon": {
-                    "light": "resources/light/refresh.svg",
-                    "dark": "resources/dark/refresh.svg"
-                }
-            },
-            {
                 "command": "task.run",
                 "title": "Run",
                 "icon": {
-                    "light": "resources/run.svg",
-                    "dark": "resources/run.svg"
+                    "light": "resources/light/run.svg",
+                    "dark": "resources/dark/run.svg"
                 }
             },
             {
@@ -51,16 +42,25 @@
                     "light": "resources/stop.svg",
                     "dark": "resources/stop.svg"
                 }
+            },
+            {
+                "command": "workspace.remove",
+                "title": "recycle",
+                "icon": {
+                    "light": "resources/light/recycle.svg",
+                    "dark": "resources/dark/recycle.svg"
+                }
+            },
+            {
+                "command": "workspace.refresh",
+                "title": "refresh",
+                "icon": {
+                    "light": "resources/light/refresh.svg",
+                    "dark": "resources/dark/refresh.svg"
+                }
             }
         ],
         "menus": {
-            "view/title": [
-                {
-                    "command": "task.refresh",
-                    "when": "view == task-running",
-                    "group": "navigation"
-                }
-            ],
             "view/item/context": [
                 {
                     "command": "task.run",
@@ -68,13 +68,18 @@
                     "group": "inline"
                 },
                 {
-                    "command": "task.restart",
-                    "when": "view =~ /task-running/ && viewItem == restart",
+                    "command": "task.stop",
+                    "when": "view =~ /task-running/ && viewItem == running",
                     "group": "inline"
                 },
                 {
-                    "command": "task.stop",
-                    "when": "view =~ /task-running/ && viewItem == running",
+                    "command": "workspace.remove",
+                    "when": "view =~ /task-running/ && viewItem == other",
+                    "group": "inline"
+                },
+                {
+                    "command": "workspace.refresh",
+                    "when": "view =~ /task-running/ && viewItem == current",
                     "group": "inline"
                 }
             ]
@@ -96,7 +101,7 @@
                 {
                     "id": "task-explorer",
                     "title": "Run Task",
-                    "icon": "resources/english.svg"
+                    "icon": "resources/logo.svg"
                 }
             ]
         },

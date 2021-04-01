@@ -1,6 +1,4 @@
 const vscode = require('vscode');
-const path = require('path');
-const runningIcon = path.join(__dirname, '..', '..', 'resources', 'running.svg');
 
 class Views {
 
@@ -37,7 +35,9 @@ class Views {
     sortForClicks() {
         for (let workspace of this.treeData) {
             workspace.children.sort((a, b) => {
-                let res = parseInt(b.clicks || 0) - parseInt(a.clicks || 0);
+                let aClicks = parseInt((a.logs && a.logs.clicks) || 0);
+                let bClicks = parseInt((b.logs && b.logs.clicks) || 0);
+                let res = bClicks - aClicks;
                 return res
             })
         }
@@ -49,23 +49,29 @@ class ViewsItemTitle extends vscode.TreeItem {
     constructor(item) {
         const { name, description, children } = item;
         super(name);
-        // this.description = description;
-        this.contextValue = 'title';
+        this.contextValue = (vscode.workspace.name === name) ? 'current' : 'other';
         this.description = '';
         this.tooltip = description
         this.collapsibleState = (name === vscode.workspace.name ? 2 : 1);
-        //name === vscode.workspace.name ? 1 : 0
     };
 
 }
 
 class ViewsItemContent extends vscode.TreeItem {
     constructor(item) {
-        const { cmdLineDesc, filePath, fileName, active, iconPath } = item;
-        super(cmdLineDesc);
+        const { cmdLineDesc, filePath, fileName, active, iconPath, logs } = item;
+        let label = cmdLineDesc;
+        let description = active ? 'RUNNING' : '';
+        //未运行过的命令，将label的内容放到description中
+        if (!logs || !logs.clicks) {
+            label = ''
+            description = cmdLineDesc + ' ' + description;
+        }
+
+        super(label);
         this.contextValue = active ? 'running' : 'unstart';
-        this.iconPath = iconPath;//active ? runningIcon : '';
-        this.description = active ?'RUNNING':fileName;
+        this.iconPath = iconPath;
+        this.description = description;
         this.tooltip = filePath
 
     };

@@ -30,7 +30,7 @@ class ViewsContainers {
     run(item) {
         let tree = this._findUpdateItem(item);
         tree.active = true;
-        tree.clicks = parseInt(tree.clicks || 0) + 1;
+        this.setLogs('clicks', tree)
         this.refresh();
 
         let loader = this.findLoader(this.loaderList, item);
@@ -41,17 +41,28 @@ class ViewsContainers {
 
     }
 
+    setLogs(type, tree) {
+        if (!tree) return;
+        if (type === 'clicks') {
+            tree.logs = tree.logs || {};
+            tree.logs.clicks = parseInt(tree.logs.clicks || 0) + 1;
+            globalStorage.update(this.context, this.treeData);
+        }
+    }
+
     restart(item) {
 
     }
 
 
     stop(item) {
-        // let tree = this._findUpdateItem(item);
-        // tree.active = false;
-        // this.refresh();
+
         let loader = this.findLoader(this.loaderList, item);
         loader && loader.stopTask(item);
+
+        let tree = this._findUpdateItem(item);
+        tree.active = false;
+        this.refresh();
     }
 
     get() {
@@ -65,6 +76,20 @@ class ViewsContainers {
     clear() {
         globalStorage.update(this.context, defaultTasks);
         this.refresh();
+    }
+
+    removeWorkSpace(workspace) {
+        const currentWorkspace = this.get();
+        const index = currentWorkspace.findIndex((tasks) => tasks.name === workspace.name);
+        currentWorkspace.splice(index, 1);
+        globalStorage.update(this.context, this.treeData);
+        this.refresh();
+    }
+
+    workspaceRefresh(workspace) {
+
+        this.loaderList = this.setupLoaders(vscode.workspace.getConfiguration('runtask'));
+
     }
 
     setupLoaders(globalConfig) {
@@ -91,9 +116,12 @@ class ViewsContainers {
             children: []
         }
 
+        let preWorkspaceTreeChildren = null;
+
         const index = currentState.findIndex((item) => item.name === vscode.workspace.name);
 
         if (index > -1) {
+            preWorkspaceTreeChildren = currentState[index].children;
             currentState[index] = tree
         } else {
             currentState.unshift(tree)
@@ -101,6 +129,15 @@ class ViewsContainers {
 
         for (const task of loaderList) {
             task.loadTask((tasks) => {
+                //将历史的操作记录数据移植到新treeData中
+                if (preWorkspaceTreeChildren) {
+                    for (let item of tasks) {
+                        let preTask = preWorkspaceTreeChildren.find((task) => task.cmdLineDesc === item.cmdLineDesc);
+                        if (preTask) {
+                            item.logs = preTask.logs;
+                        }
+                    }
+                }
                 tree.children = tree.children.concat(tasks);
                 globalStorage.update(this.context, this.treeData)
 

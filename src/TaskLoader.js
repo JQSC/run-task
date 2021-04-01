@@ -1,7 +1,7 @@
 const vscode = require('vscode');
 const path = require('path');
 const fs = require('fs');
-const { spawn, exec, execFile } = require("child_process")
+const { spawn, exec, execSync, execFile } = require("child_process")
 const { NPM_KEY, GULP_KEY, SCRIPT_KEY } = require('./shared/loaderConfig')
 
 class TaskLoader {
@@ -32,6 +32,28 @@ class TaskLoader {
         return this.parseTasksFromFile(foundList, callback)
     }
 
+
+    runTask2(item, callback) {
+
+        const { cmdLineDesc, filePath, uid } = item;
+
+        const dirname = path.dirname(filePath)
+
+        const terminal = vscode.window.createTerminal({
+            name: uid
+        });
+
+        terminal.show();
+
+        terminal.sendText(`cd "${dirname}"`);
+
+        terminal.sendText(cmdLineDesc);
+
+        item.process = terminal;
+        this.procession.add(item);
+
+    }
+
     runTask(item, callback) {
 
         const { cmdLine, filePath } = item;
@@ -39,7 +61,7 @@ class TaskLoader {
         const options = {
             cwd: path.dirname(filePath),
             detached: true,
-            shell: true
+            shell: true//process.env.ComSpec
         }
 
         //执行文件或执行系统命令 ['npm', 'run', 'dev']
@@ -53,10 +75,10 @@ class TaskLoader {
         //出现错误结束子进程
         subProcess.stderr.on('data', (data) => {
             console.log('data: ');
-
             this.killSubProcess(subProcess);
             typeof callback === 'function' && callback();
         });
+
         //保护
         subProcess.on('close', () => {
             console.log('close: ');
@@ -64,28 +86,13 @@ class TaskLoader {
             typeof callback === 'function' && callback();
         });
 
-
-        subProcess.on('error', () => {
-            console.log('error: ');
-        });
-
-        subProcess.on('exit', () => {
-            console.log('exit: ');
-        });
-
-        subProcess.on('error', () => {
-            console.log('error: ');
-        });
-
-
     }
-
 
     stopTask(tree) {
         for (let item of this.procession) {
             if (item.key === tree.key) {
-                item.process.kill('SIGINT');
-                //this.killSubProcess(item.process);
+                this.killSubProcess(item.process);
+                //item.process.dispose();
             }
         }
 
@@ -120,6 +127,17 @@ class TaskLoader {
 
     platformShell(v) {
         return process.platform === "win32" ? (v + ".cmd") : v;
+    }
+
+
+    processIsExist(pid) {
+        const checkTaskCmd = 'tasklist|findstr ' + pid;
+        let isExist;
+        try {
+            isExist = execSync(checkTaskCmd);
+
+        } catch (e) { }
+        return !!isExist
     }
 
     killSubProcess(subprocess) {
