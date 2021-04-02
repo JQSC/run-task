@@ -1,6 +1,4 @@
 const vscode = require('vscode');
-const path = require('path');
-const fs = require('fs');
 const View = require('./Views');
 const globalStorage = require('../globalStorage')
 const loaders = require('../loaders')
@@ -50,11 +48,6 @@ class ViewsContainers {
         }
     }
 
-    restart(item) {
-
-    }
-
-
     stop(item) {
 
         let loader = this.findLoader(this.loaderList, item);
@@ -86,7 +79,7 @@ class ViewsContainers {
         this.refresh();
     }
 
-    workspaceRefresh(workspace) {
+    workspaceRefresh() {
 
         this.loaderList = this.setupLoaders(vscode.workspace.getConfiguration('runtask'));
 

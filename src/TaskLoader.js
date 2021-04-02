@@ -33,7 +33,7 @@ class TaskLoader {
     }
 
 
-    runTask2(item, callback) {
+    runTerminal(item, callback) {
 
         const { cmdLineDesc, filePath, uid } = item;
 

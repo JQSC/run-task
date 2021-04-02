@@ -17,7 +17,7 @@ function activate(context) {
     })
 
     registerCommand('task.stop', () => {
-        //无法得知终端的详细状态
+        //无法结束子进程产生的进程
         //return ViewsContainers.stop(treeItem);
     })
 
@@ -26,7 +26,7 @@ function activate(context) {
     })
 
     registerCommand('workspace.refresh', (workspace) => {
-        return ViewsContainers.workspaceRefresh(workspace);
+        return ViewsContainers.workspaceRefresh();
     })
 }
 
