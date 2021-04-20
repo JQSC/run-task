@@ -10,7 +10,7 @@ function activate(context) {
 
     //注册菜单展开时事件
     registerTreeDataProvider('task-running', ViewsContainers.working);
-    registerTreeDataProvider('task-deprecated', ViewsContainers.deprecated);
+    //registerTreeDataProvider('task-deprecated', ViewsContainers.deprecated);
 
     registerCommand('task.run', (treeItem) => {
         return ViewsContainers.run(treeItem);

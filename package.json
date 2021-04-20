@@ -1,9 +1,9 @@
 {
-    "name": "y",
+    "name": "run-task",
     "publisher":"csq",
-    "displayName": "run-task",
+    "displayName": "run task",
     "description": "Task manager and runner for Gulp, NPM builtin tasks and shell scripts.",
-    "version": "0.0.1",
+    "version": "0.1.0",
     "engines": {
         "vscode": "^1.54.0"
     },
@@ -87,10 +87,6 @@
                 {
                     "id": "task-running",
                     "name": "WORKING"
-                },
-                {
-                    "id": "task-deprecated",
-                    "name": "DEPRECATED"
                 }
             ]
         },
