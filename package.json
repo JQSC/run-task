@@ -3,12 +3,20 @@
     "publisher":"csq",
     "displayName": "run task",
     "description": "Task manager and runner for Gulp, NPM builtin tasks and shell scripts.",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "engines": {
         "vscode": "^1.54.0"
     },
     "categories": [
         "Other"
+    ],
+    "keywords": [
+        "run",
+        "task",
+        "execute",
+        "执行",
+        "任务",
+        "执行任务"
     ],
     "activationEvents": [
         "*"
